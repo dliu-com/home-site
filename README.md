@@ -9,8 +9,8 @@ The site is deployed as static files from `src/` to a private S3 bucket served t
 ## Shared UI
 The pages use the shared dliu.com look ([spec](https://files.dliu.com/dliu.com/README.md), [demo](https://files.dliu.com/dliu.com/ui/v1/demo.html)):
 
-- `https://files.dliu.com/dliu.com/ui/v1/dl.css` loads first, then `/style.css`. The DL icon `https://files.dliu.com/dliu.com/favicon.png` is the favicon and header logo.
-- Pages use the shared `dl-header` (logo, `Dewei Liu` brand, `dl-nav`), `dl-main`, `dl-footer`, `dl-card` and `dl-button` classes. Light theme only, no shared JavaScript.
+- `https://files.dliu.com/dliu.com/ui/v1/dl.css` loads first, then `/style.css`. The site has no logo of its own, so the DL icon `https://files.dliu.com/dliu.com/favicon.png` is its favicon and header logo.
+- Pages use the shared `dl-header` (logo and `Dewei Liu` in one `dl-brand` link; no menu, as the page's own links cover GitHub, LinkedIn and the résumé), `dl-main`, `dl-footer` (starting with the shared DL logo, `dl-footer-logo`), and `dl-card` classes. Light theme only, no shared JavaScript.
 - `src/style.css` keeps only landing-page rules and uses the `--dl-*` variables, with no colours of its own. `cdk/test/shared-ui.test.ts` guards this.
 
 ## Resume

@@ -22,11 +22,10 @@ test('every page has the shared header with the DL icon, and the shared footer',
   for (const file of pages) {
     const page = read(file);
     expect(page).toContain('<body class="dl-page">');
-    expect(page).toContain(`<a class="dl-logo" href="https://dliu.com" aria-label="dliu.com"><img src="${DL_ICON}"`);
-    expect(page).toContain('<a class="dl-brand" href="/">Dewei Liu</a>');
-    expect(page).toContain('<nav class="dl-nav" aria-label="Site">');
+    expect(page).toContain(`<a class="dl-brand" href="/"><img class="dl-logo" src="${DL_ICON}" alt="" width="32" height="32">Dewei Liu</a>`);
+    expect(page).not.toContain('class="dl-nav"');
     expect(page).toMatch(/<main class="dl-main[" ]/);
-    expect(page).toContain('<footer class="dl-footer"><a href="https://dliu.com">dliu.com</a>');
+    expect(page).toMatch(new RegExp(`<footer class="dl-footer">\\s*<a class="dl-footer-logo" href="https://dliu.com" aria-label="dliu.com"><img src="${DL_ICON}" alt="" width="24" height="24"></a>\\s*<a href="https://dliu.com">dliu.com</a>`));
   }
 });
 
