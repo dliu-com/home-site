@@ -1,0 +1,16 @@
+/* dliu.com landing page only. Header, cards, colours and footer come from the shared dl.css. */
+.dl-main h1 { margin-bottom: 4px; }
+.tagline { margin: 0 0 16px; }
+.intro { margin: 0 0 12px; line-height: 1.6; }
+.links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 40px; padding: 0; list-style: none; }
+.dl-main h2 {
+  margin: 0 0 12px; color: var(--dl-muted); font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+section { margin-bottom: 36px; }
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.app-card { display: block; color: var(--dl-text); transition: border-color 0.15s; }
+.app-card:hover { border-color: var(--dl-accent); text-decoration: none; }
+.app-card strong { display: block; font-size: 15px; }
+.app-card span { display: block; color: var(--dl-muted); font-size: 14px; }
+.app-card small { display: block; margin-top: 6px; color: var(--dl-muted); font-size: 12px; }

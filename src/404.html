@@ -1,33 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Page not found · Dewei Liu</title>
   <link rel="icon" type="image/png" href="https://files.dliu.com/dliu.com/favicon.png">
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
-  <style>
-    :root { --bg: #ffffff; --fg: #1a1a1a; --muted: #6b6f76; --accent: #2f7de1; }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #111214; --fg: #ececee; --muted: #9a9ca3; --accent: #6aa8ff; }
-    }
-    body {
-      margin: 0; background: var(--bg); color: var(--fg);
-      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
-    }
-    main { max-width: 680px; margin: 0 auto; padding: 72px 24px; }
-    h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.02em; }
-    p { color: var(--muted); margin: 0 0 20px; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-  <main>
+<body class="dl-page">
+  <header class="dl-header">
+    <a class="dl-logo" href="https://dliu.com" aria-label="dliu.com"><img src="https://files.dliu.com/dliu.com/favicon.png" alt="DL" width="32" height="32"></a>
+    <a class="dl-brand" href="/">Dewei Liu</a>
+    <nav class="dl-nav" aria-label="Site">
+      <a class="dl-nav-link" href="https://github.com/dliu-com">GitHub</a>
+      <a class="dl-nav-link" href="https://www.linkedin.com/in/deweiliu/">LinkedIn</a>
+      <a class="dl-button dl-button-primary" href="/resume.pdf" download="Dewei-Liu-Resume.pdf">Résumé</a>
+    </nav>
+  </header>
+  <main class="dl-main dl-narrow">
     <h1>Page not found</h1>
-    <p>The page you're looking for doesn't exist or has moved.</p>
-    <a href="/">← Back to dliu.com</a>
+    <p class="dl-muted">The page you're looking for doesn't exist or has moved.</p>
+    <p><a href="/">← Back to dliu.com</a></p>
   </main>
+  <footer class="dl-footer"><a href="https://dliu.com">dliu.com</a> · <a href="/resume.pdf">Résumé</a> · <a href="https://github.com/dliu-com">GitHub</a></footer>
 </body>
 </html>

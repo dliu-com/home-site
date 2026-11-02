@@ -1,62 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Dewei Liu</title>
   <meta name="description" content="Dewei Liu — software engineer. Projects and apps hosted on dliu.com.">
   <link rel="icon" type="image/png" href="https://files.dliu.com/dliu.com/favicon.png">
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
-  <style>
-    :root {
-      --bg: #ffffff; --fg: #1a1a1a; --muted: #6b6f76; --line: #e8e8ea;
-      --card: #fafafa; --accent: #2f7de1;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #111214; --fg: #ececee; --muted: #9a9ca3; --line: #26282c; --card: #17181b; --accent: #6aa8ff; }
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--fg);
-      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
-    }
-    main { max-width: 680px; margin: 0 auto; padding: 72px 24px 48px; }
-    header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-    header img { width: 52px; height: 52px; border-radius: 12px; }
-    h1 { font-size: 28px; margin: 0; letter-spacing: -0.02em; }
-    .tagline { color: var(--muted); margin: 0; }
-    .intro { margin: 0 0 12px; }
-    .links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 48px; padding: 0; list-style: none; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    h2 {
-      font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-      color: var(--muted); margin: 0 0 12px;
-    }
-    section { margin-bottom: 40px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-    .card {
-      display: block; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px;
-      background: var(--card); color: var(--fg); transition: border-color .15s, transform .15s;
-    }
-    .card:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
-    .card strong { display: block; font-size: 15px; }
-    .card span { display: block; color: var(--muted); font-size: 14px; }
-    .card small { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; opacity: .8; }
-    footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 20px; margin-top: 56px; }
-  </style>
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-  <main>
-    <header>
-      <img src="https://files.dliu.com/dliu.com/favicon.png" alt="">
-      <div>
-        <h1>Dewei Liu</h1>
-        Software engineer · Belfast, UK
-      </div>
-    </header>
-
+<body class="dl-page">
+  <header class="dl-header">
+    <a class="dl-logo" href="https://dliu.com" aria-label="dliu.com"><img src="https://files.dliu.com/dliu.com/favicon.png" alt="DL" width="32" height="32"></a>
+    <a class="dl-brand" href="/">Dewei Liu</a>
+    <nav class="dl-nav" aria-label="Site">
+      <a class="dl-nav-link" href="https://github.com/dliu-com">GitHub</a>
+      <a class="dl-nav-link" href="https://www.linkedin.com/in/deweiliu/">LinkedIn</a>
+      <a class="dl-button dl-button-primary" href="/resume.pdf" download="Dewei-Liu-Resume.pdf">Résumé</a>
+    </nav>
+  </header>
+  <main class="dl-main dl-narrow">
+    <h1>Dewei Liu</h1>
+    <p class="tagline dl-muted">Software engineer · Belfast, UK</p>
     <p class="intro">I build and run small, serverless web apps on AWS. Everything here is hosted under dliu.com.</p>
     <ul class="links">
       <li><a href="/resume.pdf" download="Dewei-Liu-Resume.pdf">Résumé (PDF)</a></li>
@@ -68,23 +33,23 @@
 
     <section>
       <h2>Apps</h2>
-      <div class="grid">
-        <a class="card" href="https://weiqi.dliu.com/">
+      <div class="app-grid">
+        <a class="dl-card app-card" href="https://weiqi.dliu.com/">
           <strong>Weiqi · 围棋</strong>
           <span>Play Go online, with AI features</span>
           <small>weiqi.dliu.com</small>
         </a>
-        <a class="card" href="https://xiangqi.dliu.com/">
+        <a class="dl-card app-card" href="https://xiangqi.dliu.com/">
           <strong>Xiangqi · 象棋</strong>
           <span>Two-player Chinese chess</span>
           <small>xiangqi.dliu.com</small>
         </a>
-        <a class="card" href="https://share.dliu.com/">
+        <a class="dl-card app-card" href="https://share.dliu.com/">
           <strong>Share</strong>
           <span>Share files and links</span>
           <small>share.dliu.com</small>
         </a>
-        <a class="card" href="https://video.dliu.com/">
+        <a class="dl-card app-card" href="https://video.dliu.com/">
           <strong>Video</strong>
           <span>Video library</span>
           <small>video.dliu.com</small>
@@ -94,26 +59,25 @@
 
     <section>
       <h2>More</h2>
-      <div class="grid">
-        <a class="card" href="https://blog.dliu.com/">
+      <div class="app-grid">
+        <a class="dl-card app-card" href="https://blog.dliu.com/">
           <strong>Blog</strong>
           <span>Technical and personal notes</span>
           <small>blog.dliu.com</small>
         </a>
-        <a class="card" href="https://files.dliu.com/">
+        <a class="dl-card app-card" href="https://files.dliu.com/">
           <strong>Files</strong>
           <span>Static file host for my sites</span>
           <small>files.dliu.com</small>
         </a>
-        <a class="card" href="https://traffic.dliu.com/">
+        <a class="dl-card app-card" href="https://traffic.dliu.com/">
           <strong>Traffic</strong>
           <span>Visitor stats across dliu.com</span>
           <small>traffic.dliu.com</small>
         </a>
       </div>
     </section>
-
-    <footer>© Dewei Liu · dliu.com</footer>
   </main>
+  <footer class="dl-footer"><a href="https://dliu.com">dliu.com</a> · <a href="/resume.pdf">Résumé</a> · <a href="https://github.com/dliu-com">GitHub</a></footer>
 </body>
 </html>
