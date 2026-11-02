@@ -88,6 +88,7 @@ function handler(event) {
       },
       domainNames: [domainName],
       certificate,
+      httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
       defaultRootObject: 'index.html',
       errorResponses: [
         {
@@ -110,15 +111,34 @@ function handler(event) {
 
     siteBucket.grantRead(originAccessIdentity);
 
-    new s3deploy.BucketDeployment(this, 'DeploySiteFiles', {
+    const siteSource = s3deploy.Source.asset(path.join(__dirname, '..', '..', 'src'));
+
+    // HTML keeps the default caching; other files (e.g. resume.pdf) are invalidated on every
+    // deploy, so the edge may cache them for a day.
+    const staticFiles = new s3deploy.BucketDeployment(this, 'DeployStaticFiles', {
       destinationBucket: siteBucket,
-      destinationKeyPrefix: '',
-      sources: [
-        s3deploy.Source.asset(path.join(__dirname, '..', '..', 'src')),
+      sources: [siteSource],
+      exclude: ['*.html'],
+      cacheControl: [
+        s3deploy.CacheControl.setPublic(),
+        s3deploy.CacheControl.maxAge(Duration.minutes(5)),
+        s3deploy.CacheControl.sMaxAge(Duration.days(1)),
+        s3deploy.CacheControl.fromString('stale-while-revalidate=86400'),
       ],
       distribution,
       distributionPaths: ['/*'],
     });
+
+    const htmlFiles = new s3deploy.BucketDeployment(this, 'DeploySiteFiles', {
+      destinationBucket: siteBucket,
+      destinationKeyPrefix: '',
+      sources: [siteSource],
+      exclude: ['*'],
+      include: ['*.html'],
+      distribution,
+      distributionPaths: ['/*'],
+    });
+    htmlFiles.node.addDependency(staticFiles);
 
     new route53.ARecord(this, 'SiteAliasRecord', {
       zone: hostedZone,
