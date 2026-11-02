@@ -26,10 +26,14 @@
 \titlespacing*{\section}{0pt}{6pt}{4pt}
 
 % Heading line of an entry: date, title, organisation.
+% The title column widens when a title is too long for it.
+\newlength{\titlew}
 \newcommand{\entry}[3]{%
   \par\vspace{4pt}%
   {\sffamily\bfseries\fontsize{10}{12}\selectfont
-   \makebox[135pt][l]{#1}\makebox[165pt][l]{#2}#3}\par\vspace{1pt}}
+   \settowidth{\titlew}{#2}\addtolength{\titlew}{12pt}%
+   \ifdim\titlew<165pt \setlength{\titlew}{165pt}\fi
+   \makebox[135pt][l]{#1}\makebox[\titlew][l]{#2}#3}\par\vspace{1pt}}
 
 % Indented paragraph whose wrapped lines hang further in.
 \newenvironment{hang}{\par\leftskip=\indentw\hangindent=20pt\hangafter=1}{\par}
@@ -45,6 +49,10 @@
 \end{minipage}
 
 \section{Education}
+\entry{October 2026}{MSc Machine Learning and Data Science}{Imperial College London, UK}
+\begin{hang}\textbf{Merit} awarded in October 2026 (grade average 66\%)\end{hang}
+\begin{hang}Part-time online course delivered by the Department of Mathematics\end{hang}
+
 \entry{2017 -- Current}{BEng Computer Science}{Queen's University Belfast, UK}
 \begin{hang}\textbf{First-class honours degree} expected in June 2020 (current grade average 83\%)\end{hang}
 \begin{hang}\textbf{Degree-Plus accreditation} awarded for extra-curricular development and achievements\end{hang}
@@ -79,11 +87,11 @@
 \section{Experiences}
 \entry{August 2020 -- Current}{Senior Software Engineer}{Liberty IT, Belfast, UK}
 
-\entry{September 2019 -- Current}{Teaching Assistant}{Queen's University Belfast, UK}
+\entry{September 2019 -- May 2020}{Teaching Assistant}{Queen's University Belfast, UK}
 \begin{itemize}
   \item Technical demonstrator in modules Data Structure, Database, Algorithm and Android Development
-  \item Assist Computer Science students in their assignments and practical classes
-  \item Invigilate module exams. Mark assessments and provide valuable feedback
+  \item Assisted Computer Science students in their assignments and practical classes
+  \item Invigilated module exams. Marked assessments and provided valuable feedback
 \end{itemize}
 
 \entry{June 2019 - July 2019}{Research Intern}{Institute of Electronics, Communications \& IT, UK}
