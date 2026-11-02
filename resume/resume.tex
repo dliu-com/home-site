@@ -1,0 +1,131 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext}
+\usepackage{carlito}
+\usepackage[top=15mm,bottom=12mm,left=14mm,right=12.5mm]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{link}{HTML}{0563C1}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\raggedright
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\linespread{0.97}
+\hypersetup{pdftitle={Dewei Liu - Resume}, pdfauthor={Dewei Liu}}
+
+\newlength{\indentw}\setlength{\indentw}{30pt}
+\newcommand{\weblink}[2]{\href{#1}{\textcolor{link}{\underline{#2}}}}
+\newcommand{\field}[1]{{\sffamily\bfseries\small #1}}
+
+\titleformat{\section}{\fontsize{15}{17}\selectfont\bfseries\itshape}{}{0pt}{}[\vspace{1pt}\titlerule]
+\titlespacing*{\section}{0pt}{6pt}{4pt}
+
+% Heading line of an entry: date, title, organisation.
+\newcommand{\entry}[3]{%
+  \par\vspace{4pt}%
+  {\sffamily\bfseries\fontsize{10}{12}\selectfont
+   \makebox[135pt][l]{#1}\makebox[165pt][l]{#2}#3}\par\vspace{1pt}}
+
+% Indented paragraph whose wrapped lines hang further in.
+\newenvironment{hang}{\par\leftskip=\indentw\hangindent=20pt\hangafter=1}{\par}
+
+\setlist[itemize]{leftmargin=49pt,itemsep=0pt,topsep=0pt,parsep=0pt,label=\textbullet}
+
+\begin{document}
+
+{\sffamily\bfseries\fontsize{22}{24}\selectfont DEWEI LIU}\par\vspace{-2pt}
+\rule{\textwidth}{0.5pt}\par\vspace{1pt}
+\begin{minipage}{\textwidth}
+  \hspace*{\indentw}\field{Address}: 87 Wellesley Avenue, Belfast, BT9 6DH, Northern Ireland\\[1pt]
+  \hspace*{\indentw}\makebox[255pt][l]{\field{Website}: \weblink{https://dliu.com}{dliu.com}}\field{LinkedIn}: \weblink{https://www.linkedin.com/in/deweiliu}{linkedin.com/in/deweiliu}
+\end{minipage}
+
+\section{Objective}
+{\leftskip=\indentw
+A self-motivated and open-minded Computer Science student with an international perspective looking for a graduate engineer position in the UK, where I can apply my outstanding technical and problem-solving skills in a diverse team.\par}
+
+\section{Education}
+\entry{2017 -- Current}{BEng Computer Science}{Queen's University Belfast, UK}
+\begin{hang}\textbf{First-class honours degree} expected in June 2020 (current grade average 83\%)\end{hang}
+\begin{hang}\textbf{Degree-Plus accreditation} awarded for extra-curricular development and achievements\end{hang}
+\begin{hang}\textbf{Professional Erasmus Placement}. Software Engineer at Ericsson in Ireland\end{hang}
+\begin{hang}\textbf{Course Representative}. Bridge between students and lecturers. Gather module feedback from students. Attend Student Union meetings to improve academic provision and course development\end{hang}
+\begin{hang}\textbf{Student Assistant}. Help organise university events and staff in the events as a student helper. Member of International Buddy Scheme to assist international students in their enrollment \& orientation\end{hang}
+\begin{hang}\textbf{Modules}: Data Structures \& Algorithms, Cloud Computing, Machine Learning, AI \& Data Analytics, Network Security, Information Modelling \& SQL, Android Development, Theory of Computation\end{hang}
+\begin{hang}\textbf{Dissertation Project}: Deep Learning for the Deployment of Mobile Apps (keywords: fog/edge computing, dynamic binding, autonomic control loop, predictive model, mobile backend, IoT)\end{hang}
+
+\entry{2015 - 2017}{BEng Computer Science}{Guangdong University of Technology, China}
+\begin{hang}\textbf{Grade Average:} 84\% (top 2 in my class)\end{hang}
+\begin{hang}\textbf{Modules:} C, C++, Java Programming, Calculus, Data Structures, Algorithm Analysis, Linear Algebra, Advanced Mathematics, Discrete Mathematics, Networking, System Design \& Organisation\end{hang}
+\begin{hang}\textbf{Class monitor}. Organised inter-class events. Held class elections. Monitored classmates' learning progress and helped them with their difficulties in study and living.\end{hang}
+\begin{hang}\textbf{Vice-president} in Canteen Monitoring Commission. Organised food security checks in university canteens. Received food quality complaints from students. Advertised canteen jobs to students.\end{hang}
+{\leftskip=\indentw The degree will be awarded when the degree from Queen's University Belfast has been awarded\par}
+
+\entry{2012 - 2015}{High School Diploma in Science}{Wuzhou Senior High School, China}
+\begin{hang}\textbf{Subjects}: Mathematics - A, Physics - A, Biology - A, IT - A, Chemistry - B, English - B\end{hang}
+\begin{hang}\textbf{Class monitor}. The school ranking of my class improved from 15\textsuperscript{th} to 6\textsuperscript{th} out of 16 classes during my two-year monitoring\end{hang}
+\begin{hang}\textbf{Class Representative of Mathematics}. Presented mathematics exams \& homework solutions to the class. Taught the class during teacher's leave because of my outstanding mathematics knowledge\end{hang}
+\begin{hang}\textbf{Second prize award} in Provincial Mathematics Competition representing the school\end{hang}
+
+\section{Skills}
+\begin{hang}\textbf{Programming}: Java, Python, C/C++, C\#, SQL, Bash, JavaScript, YAML, R, Matlab \& adaptive to learn any new programming language\end{hang}
+\begin{hang}\textbf{Technical Skills:} AI, machine/deep learning, neural network, IoT, data analysis, edge/fog computing, virtual machines, containers, code review, Agile, web app frameworks\end{hang}
+\begin{hang}\textbf{Technologies}: Azure, AWS, Google Cloud, Red Hat Linux, Tensorflow, Web Frameworks, Node.js, Terraform, Bootstrap, DOT NET, RPM, Kubernetes, MS Office, Jira, Confluence\end{hang}
+\begin{hang}\textbf{Technical Strengths}: algorithms, data structures, mathematics, debugging, coding quality\end{hang}
+\begin{hang}\textbf{Other Strengths}: problem-solving, leadership, teamwork, adaptive in new environments\end{hang}
+
+\newpage
+\vspace*{8pt}
+\section{Experiences}
+\entry{August 2020 -- Current}{Senior Software Engineer}{Liberty IT, Belfast, UK}
+
+\entry{September 2019 -- Current}{Teaching Assistant}{Queen's University Belfast, UK}
+\begin{itemize}
+  \item Technical demonstrator in modules Data Structure, Database, Algorithm and Android Development
+  \item Assist Computer Science students in their assignments and practical classes
+  \item Invigilate module exams. Mark assessments and provide valuable feedback
+\end{itemize}
+
+\entry{June 2019 - July 2019}{Research Intern}{Institute of Electronics, Communications \& IT, UK}
+\begin{itemize}
+  \item Studied an unpublished cryptography protocol Privacy-preserving Location-based Service System (PLSS) which provided location services without users revealing their actual locations
+  \item Simplified mathematical formulas of PLSS based on Zero-knowledge proof \& Schnorr signature
+  \item Implemented PLSS using C \& Java on Maven servers and Android phones
+  \item The implementation verified the protocol and provided experimental statics
+\end{itemize}
+
+\entry{July 2018 -- March 2019}{Software Engineer - Placement}{Ericsson, Ireland}
+\begin{itemize}
+  \item Solely implemented the initial concept version of Log Collection Service (LCS), which was highly recognised by the department manager and got funded by the department
+  \item Led a team of four to implement a deliverable version of LCS using Python, YAML, Red Hat Linux
+  \item Presented LCS seven times to teams worldwide and received high popularity, which shortened the time from 1 hour to 10 minutes for customers producing issue reports
+  \item Analysed the trends of Customer Support Requests (CSR) using R and Excel
+  \item Demonstrated daily CSR progress to the Customer Support department and helped the manager improve the department efficiency
+  \item Gained valuable commercial and technical experiences and developed strong communication, leadership skills and job effectiveness
+\end{itemize}
+
+\entry{2012 -- 2017}{Deputy Manager}{Restaurant, China}
+\begin{itemize}
+  \item Part-time work in my parent-owned restaurant in China for five years
+  \item Developed strong business skills, including problem-solving, marketing and leadership
+  \item Managed accounting records. Monitored the services, food quality, cleanliness and employees
+  \item Investigated and predicted the trends and customer needs in the restaurant market to increase popularity and decrease resource costs, and our profit doubled in a year
+  \item Dealt with issues from the city council, including security inspections, commercial license renewals
+  \item Helped restaurant relocation and managed the renovation
+\end{itemize}
+
+\section{Additional Details}
+\begin{itemize}
+  \item Languages: English, Mandarin Chinese, Cantonese
+  \item Member of a local charity in China which supplies food and basic needs to poor elders
+  \item Completed two international Marathon racings in the last three years
+  \item Champion of University Table Tennis Competition
+  \item References are available upon request
+\end{itemize}
+
+\end{document}
