@@ -1,54 +1,119 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dewei Liu</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="icon" type="image/png" href="https://files.dliu.com/dliu.com/favicon.png" />
-    <meta name="theme-color" content="#40B1FA">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dewei Liu</title>
+  <meta name="description" content="Dewei Liu — software engineer. Projects and apps hosted on dliu.com.">
+  <link rel="icon" type="image/png" href="https://files.dliu.com/dliu.com/favicon.png">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+  <style>
+    :root {
+      --bg: #ffffff; --fg: #1a1a1a; --muted: #6b6f76; --line: #e8e8ea;
+      --card: #fafafa; --accent: #2f7de1;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #111214; --fg: #ececee; --muted: #9a9ca3; --line: #26282c; --card: #17181b; --accent: #6aa8ff; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
+    }
+    main { max-width: 680px; margin: 0 auto; padding: 72px 24px 48px; }
+    header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    header img { width: 52px; height: 52px; border-radius: 12px; }
+    h1 { font-size: 28px; margin: 0; letter-spacing: -0.02em; }
+    .tagline { color: var(--muted); margin: 0; }
+    .intro { margin: 0 0 12px; }
+    .links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 48px; padding: 0; list-style: none; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h2 {
+      font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin: 0 0 12px;
+    }
+    section { margin-bottom: 40px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .card {
+      display: block; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px;
+      background: var(--card); color: var(--fg); transition: border-color .15s, transform .15s;
+    }
+    .card:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+    .card strong { display: block; font-size: 15px; }
+    .card span { display: block; color: var(--muted); font-size: 14px; }
+    .card small { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; opacity: .8; }
+    footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 20px; margin-top: 56px; }
+  </style>
 </head>
-
 <body>
-    <div class="w3-container">
+  <main>
+    <header>
+      <img src="https://files.dliu.com/dliu.com/favicon.png" alt="">
+      <div>
+        <h1>Dewei Liu</h1>
+        Software engineer · Belfast, UK
+      </div>
+    </header>
 
-        <div style="float: right;">
-            <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="8c545d9d-fab9-437c-bdd2-254fc07e8bb4" data-share-badge-host="https://www.credly.com"></div>
-            <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
-        </div>
+    <p class="intro">I build and run small, serverless web apps on AWS. Everything here is hosted under dliu.com.</p>
+    <ul class="links">
+      <li><a href="https://files.dliu.com/me/resume.pdf">Résumé</a></li>
+      <li><a href="https://ieeexplore.ieee.org/document/9560107">IEEE publication</a></li>
+      <li><a href="https://www.linkedin.com/in/deweiliu/">LinkedIn</a></li>
+      <li><a href="https://github.com/dliu-com">GitHub</a></li>
+      <li><a href="https://www.facebook.com/hello.dewei/">Facebook</a></li>
+    </ul>
 
-        <h1><a href="/">Dewei Liu</a></h1>
+    <section>
+      <h2>Apps</h2>
+      <div class="grid">
+        <a class="card" href="https://weiqi.dliu.com/">
+          <strong>Weiqi · 围棋</strong>
+          <span>Play Go online, with AI features</span>
+          <small>weiqi.dliu.com</small>
+        </a>
+        <a class="card" href="https://xiangqi.dliu.com/">
+          <strong>Xiangqi · 象棋</strong>
+          <span>Two-player Chinese chess</span>
+          <small>xiangqi.dliu.com</small>
+        </a>
+        <a class="card" href="https://share.dliu.com/">
+          <strong>Share</strong>
+          <span>Share files and links</span>
+          <small>share.dliu.com</small>
+        </a>
+        <a class="card" href="https://video.dliu.com/">
+          <strong>Video</strong>
+          <span>Video library</span>
+          <small>video.dliu.com</small>
+        </a>
+      </div>
+    </section>
 
-        <p>Hi, welcome to my personal website.</p>
-        <p>Please view my <a href="https://files.dliu.com/me/resume.pdf">resume</a> and my recent <a href="https://ieeexplore.ieee.org/document/9560107">publication on IEEE</a>.</p>
-        <br>
-        <p>Below are my applications</p>
-        <p><a href="https://jenkins.dliu.com">Jenkins Pipelines</a> - I manage the entire Jenkins CI/CD environment hosted on AWS. The environment is defined as Infrastructure as Code (IaC) and I made it <a href="https://github.com/deweiliu/jenkins">avilable to public</a>.</p>
-        <p><a href="https://bfa.dliu.com/">Best Friends App</a> - An online chatbot that does simple
-            conversations</p>
-        <p><a href="https://paperborne.dliu.com/">Paperborne</a> - An Android card game with an online demo.</p>
-        <p><a href="https://repeater.deweiliu.com/">Webpage Repeater</a> - Act as a proxy to display webpages.</p>
-        <br>
+    <section>
+      <h2>More</h2>
+      <div class="grid">
+        <a class="card" href="https://blog.dliu.com/">
+          <strong>Blog</strong>
+          <span>Technical and personal notes</span>
+          <small>blog.dliu.com</small>
+        </a>
+        <a class="card" href="https://files.dliu.com/">
+          <strong>Files</strong>
+          <span>Static file host for my sites</span>
+          <small>files.dliu.com</small>
+        </a>
+        <a class="card" href="https://traffic.dliu.com/">
+          <strong>Traffic</strong>
+          <span>Visitor stats across dliu.com</span>
+          <small>traffic.dliu.com</small>
+        </a>
+      </div>
+    </section>
 
-        <p>I also host open-source applications where I can learn more about me</p>
-
-        <p> <a href="https://blog.dliu.com">Dewei Blog</a> - I regularly post technical and non-technical articles on my blog</p>
-        <p><a href="https://files.dliu.com/">File Server</a> - A file server that servers static files to my other websites, powered by Apache httpd.</p>
-        <p><a href="https://dev.dliu.com/">Developer Wiki</a> - A wiki that documents how my websites are configured and how they work.</p>
-        <p><a href="https://photos.dliu.com">My Photos</a></p>
-        <br>
-
-        <p>To learn more about me, please follow me on</p>
-        <p><a href="https://www.linkedin.com/in/deweiliu/">LinkedIn</a></p>
-        <p><a href="https://github.com/deweiliu">GitHub</a></p>
-        <p><a href="https://www.facebook.com/hello.dewei/">Facebook</a></p>
-        <br>
-        <br>
-
-        <p>Thank you :)</p>
-        <img src="https://files.dliu.com/dliu.com/favicon.png" width="50px" height="50px">
-    </div>
+    <footer>© Dewei Liu · dliu.com</footer>
+  </main>
 </body>
-
 </html>
