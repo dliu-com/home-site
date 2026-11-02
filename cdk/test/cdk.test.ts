@@ -1,13 +1,37 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
-import * as cdk from '@aws-cdk/core';
-import * as Cdk from '../lib/home-site-stack';
+import { App } from 'aws-cdk-lib';
+import { Match, Template } from 'aws-cdk-lib/assertions';
+import { CdkStack } from '../lib/main-stack';
 
-test('Empty Stack', () => {
-    const app = new cdk.App();
-    // WHEN
-    const stack = new Cdk.CdkStack(app, 'MyTestStack');
-    // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+test('creates a private S3 bucket behind CloudFront', () => {
+    const app = new App();
+
+    const stack = new CdkStack(app, 'MyTestStack', {
+        env: {
+            account: '123456789012',
+            region: 'eu-west-2',
+        },
+    });
+
+    const template = Template.fromStack(stack);
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+        PublicAccessBlockConfiguration: {
+            BlockPublicAcls: true,
+            BlockPublicPolicy: true,
+            IgnorePublicAcls: true,
+            RestrictPublicBuckets: true,
+        },
+    });
+
+    template.hasResourceProperties('AWS::CloudFront::Distribution', {
+        DistributionConfig: Match.objectLike({
+            DefaultRootObject: 'index.html',
+            Enabled: true,
+        }),
+    });
+
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+        Type: 'A',
+        AliasTarget: Match.anyValue(),
+    });
 });

@@ -1,75 +1,141 @@
+import * as path from 'path';
 import { Construct } from 'constructs';
 import {
   aws_route53 as route53,
-  aws_ec2 as ec2,
-  aws_ecs as ecs,
-  aws_elasticloadbalancingv2 as elb,
+  aws_cloudfront as cloudfront,
+  aws_cloudfront_origins as origins,
   aws_certificatemanager as acm,
+  aws_s3 as s3,
+  aws_s3_deployment as s3deploy,
   StackProps,
   Stack,
   CfnOutput,
-  aws_route53_targets as alias,
+  Duration,
+  Fn,
+  RemovalPolicy,
+  aws_route53_targets as targets,
 } from 'aws-cdk-lib';
 
+export interface CdkStackProps extends StackProps {}
 
-import { ImportValues } from './import-values';
-
-export interface CdkStackProps extends StackProps {
-  maxAzs: number;
-  appId: number;
-  appName: string;
-  instanceCount: number;
-}
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props: CdkStackProps) {
     super(scope, id, props);
 
-    const get = new ImportValues(this, props);
+    const domainName = Fn.importValue('MainDomain');
 
-    const taskDefinition = new ecs.Ec2TaskDefinition(this, 'TaskDefinition', { networkMode: ecs.NetworkMode.BRIDGE });
-
-    taskDefinition.addContainer('Container', {
-      image: ecs.ContainerImage.fromRegistry(get.dockerImage),
-      containerName: `${get.appName}-container`,
-      memoryReservationMiB: 32,
-      portMappings: [{ containerPort: 80, hostPort: get.hostPort, protocol: ecs.Protocol.TCP }],
-      logging: new ecs.AwsLogDriver({ streamPrefix: get.appName }),
+    const siteBucket = new s3.Bucket(this, 'SiteBucket', {
+      publicReadAccess: false,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
 
-    const service = new ecs.Ec2Service(this, 'Service', {
-      cluster: get.cluster,
-      taskDefinition,
-      desiredCount: get.instanceCount,
-    });
-    get.clusterSecurityGroup.connections.allowFrom(get.albSecurityGroup, ec2.Port.tcp(get.hostPort), `Allow traffic from ELB for ${get.appName}`);
-
-    const albTargetGroup = new elb.ApplicationTargetGroup(this, 'TargetGroup', {
-      port: 80,
-      protocol: elb.ApplicationProtocol.HTTP,
-      healthCheck: { enabled: true },
-      vpc: get.vpc,
-      targetType: elb.TargetType.INSTANCE,
-      targets: [service],
+    const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'ImportedHostedZone', {
+      zoneName: domainName,
+      hostedZoneId: Fn.importValue('MainHostedZoneId'),
     });
 
-    new elb.ApplicationListenerRule(this, "ListenerRule", {
-      listener: get.albListener,
-      priority: get.priority,
-      targetGroups: [albTargetGroup],
-      conditions: [elb.ListenerCondition.hostHeaders([get.dnsName])],
+    const certificate = new acm.DnsValidatedCertificate(this, 'SiteCertificate', {
+      domainName,
+      hostedZone,
+      region: 'us-east-1',
     });
 
-    const certificate = new acm.Certificate(this, 'SSL', {
-      domainName: get.dnsName,
-      validation: acm.CertificateValidation.fromDns(get.hostedZone),
-    });
-    get.albListener.addCertificates('AddCertificate', [certificate]);
+    const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'SiteOriginAccessIdentity');
 
-    const record = new route53.ARecord(this, "AliasRecord", {
-      zone: get.hostedZone,
-      target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(get.alb)),
+    const viewerRequestFunction = new cloudfront.Function(this, 'ViewerRequestFunction', {
+      code: cloudfront.FunctionCode.fromInline(`
+function handler(event) {
+  var request = event.request;
+  var uri = request.uri;
+
+  if (uri.endsWith('/')) {
+    request.uri = uri + 'index.html';
+  }
+
+  return request;
+}
+`),
     });
 
-    new CfnOutput(this, 'DnsName', { value: record.domainName });
+    // Central traffic monitoring (dliu-com/traffic-monitor): shared visitor cookie; TrafficMonitor
+    // creates this distribution's access-log delivery (CloudFront standard logging v2).
+    const visitorIdFunction = cloudfront.Function.fromFunctionAttributes(this, 'VisitorId', {
+      functionArn: Fn.importValue('TrafficVisitorFunctionArn'),
+      functionName: 'dliu-visitor-id',
+    });
+    // Makes CloudFront add CloudFront-Viewer-City so the visitor function can log the city.
+    const trafficGeoPolicy = cloudfront.OriginRequestPolicy.fromOriginRequestPolicyId(
+      this, 'TrafficGeo', Fn.importValue('TrafficGeoOriginRequestPolicyId'));
+
+    const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
+      defaultBehavior: {
+        origin: origins.S3BucketOrigin.withOriginAccessIdentity(siteBucket, {
+          originAccessIdentity,
+        }),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+        cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
+        originRequestPolicy: trafficGeoPolicy,
+        functionAssociations: [
+          {
+            eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            function: viewerRequestFunction,
+          },
+          { eventType: cloudfront.FunctionEventType.VIEWER_RESPONSE, function: visitorIdFunction },
+        ],
+      },
+      domainNames: [domainName],
+      certificate,
+      defaultRootObject: 'index.html',
+      errorResponses: [
+        {
+          httpStatus: 403,
+          responseHttpStatus: 404,
+          responsePagePath: '/404.html',
+          ttl: Duration.minutes(5),
+        },
+        {
+          httpStatus: 404,
+          responseHttpStatus: 404,
+          responsePagePath: '/404.html',
+          ttl: Duration.minutes(5),
+        },
+      ],
+    });
+    // IncludeCookies is the only legacy logging setting v2 honours: it puts the dl_vid cookie in the logs.
+    (distribution.node.defaultChild as cloudfront.CfnDistribution)
+      .addPropertyOverride('DistributionConfig.Logging', { IncludeCookies: true });
+
+    siteBucket.grantRead(originAccessIdentity);
+
+    new s3deploy.BucketDeployment(this, 'DeploySiteFiles', {
+      destinationBucket: siteBucket,
+      destinationKeyPrefix: '',
+      sources: [
+        s3deploy.Source.asset(path.join(__dirname, '..', '..', 'src')),
+      ],
+      distribution,
+      distributionPaths: ['/*'],
+    });
+
+    new route53.ARecord(this, 'SiteAliasRecord', {
+      zone: hostedZone,
+      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+    });
+
+    new route53.AaaaRecord(this, 'SiteAliasIpv6Record', {
+      zone: hostedZone,
+      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+    });
+
+    new CfnOutput(this, 'WebsiteUrl', {
+      value: `https://${domainName}`,
+    });
+
+    new CfnOutput(this, 'CustomDomainUrl', {
+      value: `https://${domainName}`,
+    });
   }
 }

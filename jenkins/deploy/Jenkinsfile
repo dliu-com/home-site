@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Wait for Stack Ready'){
             steps{
-                sh(script: 'aws cloudformation wait stack-update-complete --region eu-west-2 --stack-name HomeSite', returnStatus: true)
+                sh(script: 'aws cloudformation wait stack-update-complete --region eu-west-2 --stack-name MeSite', returnStatus: true)
             }
         }
         
@@ -19,7 +19,8 @@ pipeline {
             steps{
                 dir('cdk'){
                     sh '''
-                    npm install;
+                    npm ci;
+                    npm test;
                     npm run deploy;
                     '''
                 }
