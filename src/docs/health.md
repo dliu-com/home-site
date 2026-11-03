@@ -37,8 +37,8 @@ longer than the slow threshold counts as slow.
 
 ## Health endpoint
 
-None. dliu.com has no backend. `GET https://dliu.com/health` returns `404` with the HTML 404 page; don't treat that as
-a failure.
+None. dliu.com has no backend, so it has no health endpoint and the guest checks above cover the whole site. Don't
+configure one: its health path just returns the HTML 404 page.
 
 ## Caching
 

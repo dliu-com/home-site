@@ -5,8 +5,8 @@ import * as path from 'path';
 
 const SRC = path.join(__dirname, '..', '..', 'src');
 const docs = fs.readFileSync(path.join(SRC, 'docs.html'), 'utf8');
-// The Testing tab: from its heading to the end of the article.
-const html = docs.slice(docs.indexOf('<h2 id="health">'), docs.indexOf('</article>'));
+// The Testing tab: from its heading to the page-wide source link at the end of the article.
+const html = docs.slice(docs.indexOf('<h2 id="health">'), docs.indexOf('<p class="source">'));
 const md = fs.readFileSync(path.join(SRC, 'docs', 'health.md'), 'utf8');
 
 const mdSection = (title: string) => md.split(`\n## ${title}\n`)[1].split('\n## ')[0];
@@ -17,9 +17,12 @@ const mdRows = (title: string) => mdSection(title).split('\n')
 
 const mdFunctions = mdRows('Functions').map(([key]) => key);
 const mdChecks = mdRows('Guest checks').map((cells) => cells.join(' | '));
-const htmlFunctions = [...html.matchAll(/<h3 id="function-([a-z-]+)">/g)].map((m) => m[1]);
-const htmlChecks = [...html.matchAll(/<tr data-function="([a-z-]+)">(.*?)<\/tr>/g)].map(([, key, cells]) =>
-  [key, ...[...cells.matchAll(/<td[^>]*>(?:<code>)?(.*?)(?:<\/code>)?<\/td>/g)].map((c) => c[1])].join(' | '));
+const htmlFunctions = [...html.matchAll(/<tr data-function="([a-z-]+)">/g)].map((m) => m[1]);
+// Checks per function, as drawn in the bar chart.
+const chart = Object.fromEntries([...html.matchAll(/<g data-function="([a-z-]+)" data-checks="(\d+)">/g)].map((m) => [m[1], Number(m[2])]));
+const mdChecksPer = (key: string) => mdChecks.filter((check) => check.startsWith(`${key} | `)).length;
+// The words people read: the tab without its tags.
+const text = html.replace(/<[^>]+>/g, ' ');
 
 test('/docs/health.md has every section the contract asks for', () => {
   for (const title of ['Functions', 'Guest checks', 'Health endpoint', 'Not tested', 'Rules']) {
@@ -28,27 +31,32 @@ test('/docs/health.md has every section the contract asks for', () => {
   expect(mdSection('Rules')).toMatch(/read only/);
 });
 
-test('the /docs Testing tab has the diagram, plain-language sections, folded details and the Markdown link', () => {
+test('the /docs Testing tab shows numbers, flows, a table and a chart, with the Markdown link at the end', () => {
   expect(docs).toContain('<a href="/docs#health">Testing</a>');
   expect(html).toMatch(/^<h2 id="health">/);
-  expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
-  for (const id of ['functions', 'health-endpoint', 'not-tested']) {
+  expect(html).toMatch(/<div class="dg-stats">[\s\S]*class="dg-stat"/);
+  expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-arrow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
+  for (const id of ['functions', 'not-tested']) {
     expect(html).toContain(`<h2 id="${id}">`);
   }
-  expect(html).toContain('<a href="/docs/health.md">Full technical version (Markdown)</a>');
-  expect(html).not.toMatch(/<details open/);
-  // Every check table is folded inside a <details> block.
-  for (const table of html.split('<table>').slice(1)) {
-    const before = html.slice(0, html.indexOf(table));
-    expect(before.lastIndexOf('<details>')).toBeGreaterThan(before.lastIndexOf('</details>'));
-  }
+  expect(html).toMatch(/<svg viewBox="[^"]+" width="100%" font-size="15" role="img" aria-label="Checks per function: /);
+  expect(html.trim()).toMatch(/<p><a href="\/docs\/health.md">Technical version for machines \(Markdown\)<\/a><\/p>$/);
 });
 
-test('the Testing tab and the Markdown file list the same functions and guest checks', () => {
+test('the Testing tab has no exact technical details', () => {
+  expect(html).not.toMatch(/<code|<details|<pre/);
+  expect(html).not.toMatch(/https?:\/\//);
+  expect(text).not.toMatch(/\b(200|301|302|304|401|403|404|500|502|503)\b/);
+  expect(text).not.toMatch(/text\/html|text\/css|text\/markdown|application\/|Cache-Control|Location|GET|HEAD/);
+});
+
+test('the Testing tab and the Markdown file list the same functions and checks', () => {
   expect(mdFunctions).toEqual(['pages', 'resume', 'routing', 'https']);
   expect(htmlFunctions).toEqual(mdFunctions);
-  expect(htmlChecks).toEqual(mdChecks);
-  expect(html).toContain(`<strong>Opens ${mdChecks.length} public addresses</strong>`);
+  expect(Object.keys(chart)).toEqual(mdFunctions);
+  for (const key of mdFunctions) expect(chart[key]).toBe(mdChecksPer(key));
+  expect(html).toContain(`<strong>${mdFunctions.length} functions tested</strong>`);
+  expect(html).toContain(`<strong>${mdChecks.length} checks</strong>`);
   expect(new Set(mdChecks.map((check) => check.split(' | ')[0]))).toEqual(new Set(mdFunctions));
 });
 
@@ -77,8 +85,10 @@ test('the body markers really are in the pages they are checked on', () => {
 });
 
 test('there is no /health endpoint, and both versions say so', () => {
-  expect(mdSection('Health endpoint')).toContain('no backend');
-  expect(html.split('<h2 id="health-endpoint">')[1]).toMatch(/^[\s\S]*?no server or database/);
+  // status's importer would read a /health URL here as the site having one.
+  expect(mdSection('Health endpoint').trim()).toMatch(/^None\./);
+  expect(mdSection('Health endpoint')).not.toMatch(/https?:\/\/|\/health\b/);
+  expect(text).toMatch(/no server or database/);
   expect(fs.existsSync(path.join(SRC, 'health'))).toBe(false);
   expect(fs.existsSync(path.join(SRC, 'health.html'))).toBe(false);
   expect(fs.existsSync(path.join(SRC, 'docs-health.html'))).toBe(false);
