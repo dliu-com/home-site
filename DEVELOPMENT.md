@@ -12,11 +12,11 @@ The pages use the shared dliu.com look ([spec](https://files.dliu.com/dliu.com/R
 
 ## Docs
 - [dliu.com/docs](https://dliu.com/docs) (`src/docs.html`) describes how the site works: architecture, caching, deployment, cost and security.
-- [dliu.com/docs/health](https://dliu.com/docs/health) (`src/docs-health.html`) explains in plain words, with a diagram, how [status.dliu.com](https://status.dliu.com) tests the site as a guest; the technical details are folded.
+- Its **Testing** tab, [dliu.com/docs#health](https://dliu.com/docs#health), explains in plain words, with a diagram, how [status.dliu.com](https://status.dliu.com) tests the site as a guest; the technical details are folded.
 - [dliu.com/docs/health.md](https://dliu.com/docs/health.md) (`src/docs/health.md`, served as `text/markdown; charset=utf-8`) is the full technical version for machines: functions, guest checks (URL, status, content type, body marker, slow threshold) and rules. dliu.com has no backend, so there is no `/health` endpoint.
-- Keep the two health versions in sync; `cdk/test/health.test.ts` fails if their functions or checks differ, or a body marker disappears.
+- Keep the Testing tab and `health.md` in sync; `cdk/test/health.test.ts` fails if their functions or checks differ, or a body marker disappears.
 
-The docs pages use the shared `dl-docs.css` layout and aren't linked from the header. A viewer-request CloudFront Function serves `/docs` from `docs.html`, `/docs/health` from `docs-health.html` and `/` from `index.html`. Keep the pages up to date when the stack changes.
+The docs page uses the shared `dl-docs.css` layout and isn't linked from the header. A viewer-request CloudFront Function serves `/docs` from `docs.html` and `/` from `index.html`, and redirects the old `/docs/health` to `/docs#health` (301). Keep the pages up to date when the stack changes.
 
 ## Resume
 The resume is written in LaTeX at `resume/resume.tex`. Build it with [Tectonic](https://tectonic-typesetting.github.io/) (`brew install tectonic`):

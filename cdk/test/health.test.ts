@@ -1,10 +1,12 @@
-// The dliu.com health contract (status/HEALTH.md): /docs/health (HTML, for people) and /docs/health.md (Markdown,
+// The dliu.com health contract (status/HEALTH.md): the /docs Testing tab (#health, for people) and /docs/health.md (Markdown,
 // for machines) describe the same functions and guest checks. dliu.com is static, so there is no /health endpoint.
 import * as fs from 'fs';
 import * as path from 'path';
 
 const SRC = path.join(__dirname, '..', '..', 'src');
-const html = fs.readFileSync(path.join(SRC, 'docs-health.html'), 'utf8');
+const docs = fs.readFileSync(path.join(SRC, 'docs.html'), 'utf8');
+// The Testing tab: from its heading to the end of the article.
+const html = docs.slice(docs.indexOf('<h2 id="health">'), docs.indexOf('</article>'));
 const md = fs.readFileSync(path.join(SRC, 'docs', 'health.md'), 'utf8');
 
 const mdSection = (title: string) => md.split(`\n## ${title}\n`)[1].split('\n## ')[0];
@@ -26,7 +28,9 @@ test('/docs/health.md has every section the contract asks for', () => {
   expect(mdSection('Rules')).toMatch(/read only/);
 });
 
-test('/docs/health has the diagram, plain-language sections, folded details and the Markdown link', () => {
+test('the /docs Testing tab has the diagram, plain-language sections, folded details and the Markdown link', () => {
+  expect(docs).toContain('<a href="/docs#health">Testing</a>');
+  expect(html).toMatch(/^<h2 id="health">/);
   expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
   for (const id of ['functions', 'health-endpoint', 'not-tested']) {
     expect(html).toContain(`<h2 id="${id}">`);
@@ -40,7 +44,7 @@ test('/docs/health has the diagram, plain-language sections, folded details and 
   }
 });
 
-test('the page and the Markdown file list the same functions and guest checks', () => {
+test('the Testing tab and the Markdown file list the same functions and guest checks', () => {
   expect(mdFunctions).toEqual(['pages', 'resume', 'routing', 'https']);
   expect(htmlFunctions).toEqual(mdFunctions);
   expect(htmlChecks).toEqual(mdChecks);
@@ -67,7 +71,7 @@ test('the body markers really are in the pages they are checked on', () => {
   expect(read('docs.html')).toContain('dl-docs-main');
   expect(read('style.css')).toContain('.app-grid');
   expect(md).toContain('## Guest checks');
-  expect(html).toContain('id="functions"');
+  expect(read('docs.html')).toContain('/docs#health');
   expect(read('404.html')).toContain('Page not found');
   expect(read('resume.pdf').startsWith('%PDF-')).toBe(true);
 });
@@ -77,4 +81,5 @@ test('there is no /health endpoint, and both versions say so', () => {
   expect(html.split('<h2 id="health-endpoint">')[1]).toMatch(/^[\s\S]*?no server or database/);
   expect(fs.existsSync(path.join(SRC, 'health'))).toBe(false);
   expect(fs.existsSync(path.join(SRC, 'health.html'))).toBe(false);
+  expect(fs.existsSync(path.join(SRC, 'docs-health.html'))).toBe(false);
 });

@@ -44,20 +44,25 @@ export class CdkStack extends Stack {
 
     const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'SiteOriginAccessIdentity');
 
-    // Clean URLs: / and /x/ -> index.html, /docs -> /docs.html, /docs/health -> /docs-health.html.
+    // Clean URLs: / and /x/ -> index.html, /docs -> /docs.html; the old /docs/health moved to /docs#health.
     const viewerRequestFunction = new cloudfront.Function(this, 'ViewerRequestFunction', {
       code: cloudfront.FunctionCode.fromInline(`
 var PAGES = {
   '/docs': '/docs.html',
   '/docs/': '/docs.html',
-  '/docs/health': '/docs-health.html',
-  '/docs/health/': '/docs-health.html',
+};
+var REDIRECTS = {
+  '/docs/health': '/docs#health',
+  '/docs/health/': '/docs#health',
 };
 
 function handler(event) {
   var request = event.request;
   var uri = request.uri;
 
+  if (REDIRECTS[uri]) {
+    return { statusCode: 301, statusDescription: 'Moved Permanently', headers: { location: { value: REDIRECTS[uri] } } };
+  }
   if (PAGES[uri]) {
     request.uri = PAGES[uri];
   } else if (uri.endsWith('/')) {

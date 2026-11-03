@@ -64,16 +64,20 @@ test('the viewer-request function serves clean URLs', () => {
     });
     const functions = Template.fromStack(stack).findResources('AWS::CloudFront::Function');
     const [code] = Object.values(functions).map((resource: any) => resource.Properties.FunctionCode as string);
-    const handler = new Function(`${code}; return handler;`)() as (event: any) => { uri: string };
+    const handler = new Function(`${code}; return handler;`)() as (event: any) => any;
     const route = (uri: string) => handler({ request: { uri } }).uri;
 
     expect(route('/')).toBe('/index.html');
     expect(route('/docs')).toBe('/docs.html');
     expect(route('/docs/')).toBe('/docs.html');
-    expect(route('/docs/health')).toBe('/docs-health.html');
-    expect(route('/docs/health/')).toBe('/docs-health.html');
     expect(route('/health')).toBe('/health');
     expect(route('/docs/health.md')).toBe('/docs/health.md');
     expect(route('/resume.pdf')).toBe('/resume.pdf');
     expect(route('/style.css')).toBe('/style.css');
+    // The testing page moved into the /docs Testing tab.
+    for (const uri of ['/docs/health', '/docs/health/']) {
+        const response = handler({ request: { uri } });
+        expect(response.statusCode).toBe(301);
+        expect(response.headers.location.value).toBe('/docs#health');
+    }
 });

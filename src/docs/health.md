@@ -1,6 +1,6 @@
 # dliu.com: health and guest checks
 
-Full technical version of https://dliu.com/docs/health, for machines and AI agents. It follows the dliu.com health
+Full technical version of https://dliu.com/docs#health (the Testing tab), for machines and AI agents. It follows the dliu.com health
 contract used by https://status.dliu.com and is enough on its own to implement the tests.
 
 dliu.com is a static site: HTML, CSS and a PDF in a private S3 bucket behind CloudFront. There is no backend (no Lambda,
@@ -12,7 +12,7 @@ database or API), so every function is tested with plain guest requests and ther
 | --- | --- | --- | --- |
 | `pages` | Pages | Serves the landing page, the docs pages and their stylesheet. | yes |
 | `resume` | Résumé | Serves the résumé PDF. | no |
-| `routing` | Clean URLs and 404 | Serves `/docs` and `/docs/health` without `.html`, and the 404 page for missing paths. | no |
+| `routing` | Clean URLs and 404 | Serves `/docs` without `.html`, redirects the old `/docs/health` to `/docs#health`, and serves the 404 page for missing paths. | no |
 | `https` | HTTPS | Redirects plain HTTP to HTTPS. | no |
 
 The site is "down" when a critical function fails.
@@ -31,7 +31,7 @@ longer than the slow threshold counts as slow.
 | `pages` | GET | `https://dliu.com/style.css` | 200 | `text/css` | `.app-grid` | 2000 |
 | `pages` | GET | `https://dliu.com/docs/health.md` | 200 | `text/markdown` | `## Guest checks` | 2000 |
 | `resume` | GET | `https://dliu.com/resume.pdf` | 200 | `application/pdf` | `%PDF-` | 3000 |
-| `routing` | GET | `https://dliu.com/docs/health` | 200 | `text/html` | `id="functions"` | 2000 |
+| `routing` | HEAD | `https://dliu.com/docs/health` | 301 | - | `/docs#health` | 2000 |
 | `routing` | GET | `https://dliu.com/status-check-missing-page` | 404 | `text/html` | `Page not found` | 2000 |
 | `https` | HEAD | `http://dliu.com/` | 301 | - | `https://dliu.com/` | 2000 |
 
@@ -56,5 +56,5 @@ sent with `Cache-Control: public, max-age=300, s-maxage=86400, stale-while-reval
 
 - Only `GET` and `HEAD`, as an anonymous guest. The tests are read only and must never change content.
 - Use the user agent `dliu-status-bot/1.0 (+https://status.dliu.com/docs)`, so traffic.dliu.com leaves the requests out.
-- Keep this file and https://dliu.com/docs/health in sync; the repo's `cdk/test/health.test.ts` checks that they list
+- Keep this file and https://dliu.com/docs#health in sync; the repo's `cdk/test/health.test.ts` checks that they list
   the same functions and checks.

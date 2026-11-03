@@ -11,7 +11,7 @@ const DL_DOCS_CSS = '<link rel="stylesheet" href="https://files.dliu.com/dliu.co
 const SITE_CSS = '<link rel="stylesheet" href="/style.css">';
 
 test('every page loads the shared dliu.com stylesheet before its own and uses the DL icon', () => {
-  expect(pages.sort()).toEqual(['404.html', 'docs-health.html', 'docs.html', 'index.html']);
+  expect(pages.sort()).toEqual(['404.html', 'docs.html', 'index.html']);
   for (const file of pages) {
     const page = read(file);
     expect(page).toContain(DL_CSS);
@@ -41,7 +41,7 @@ test('the site stylesheet leaves the header, buttons, footer and palette to the 
 });
 
 test('the docs pages use the shared docs layout and have no menu button', () => {
-  for (const file of ['docs.html', 'docs-health.html']) {
+  for (const file of ['docs.html']) {
     const page = read(file);
     expect(page.indexOf(DL_CSS)).toBeLessThan(page.indexOf(DL_DOCS_CSS));
     // style.css restyles h2 for the landing page, so the docs pages don't load it.
@@ -50,7 +50,7 @@ test('the docs pages use the shared docs layout and have no menu button', () => 
     expect(page).toContain('<nav class="dl-tabs" aria-label="Docs sections">');
     expect(page).toContain('<article class="dl-docs">');
     expect(page).not.toMatch(/<script\b/);
-    expect(page).toContain('<a href="/docs/health"');
+    expect(page).toContain('<a href="/docs#health">Testing</a>');
   }
   const page = read('docs.html');
   expect(page.indexOf(DL_CSS)).toBeLessThan(page.indexOf(DL_DOCS_CSS));
