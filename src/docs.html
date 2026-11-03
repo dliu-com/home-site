@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Docs · Dewei Liu · dliu.com</title>
+  <meta name="description" content="How dliu.com works: architecture, caching, deployment, cost and security">
+  <link rel="icon" type="image/png" href="https://files.dliu.com/dliu.com/favicon.png">
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl.css">
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl-docs.css">
+</head>
+<body class="dl-page">
+  <header class="dl-header">
+    <a class="dl-brand" href="/"><img class="dl-logo" src="https://files.dliu.com/dliu.com/favicon.png" alt="" width="32" height="32">Dewei Liu</a>
+  </header>
+  <main class="dl-main dl-docs-main">
+    <nav class="dl-tabs" aria-label="Docs sections">
+      <a href="/docs#architecture" aria-current="page">Technical architecture</a>
+      <a href="/docs#caching">Caching</a>
+      <a href="/docs#deployment">Deployment</a>
+      <a href="/docs#cost">Cost</a>
+      <a href="/docs#security">Security</a>
+      <a href="/docs/health">Health</a>
+    </nav>
+    <article class="dl-docs">
+      <h2 id="architecture">How it works</h2>
+      <p class="lead">dliu.com is a static site: a landing page, a 404 page, the docs pages and the résumé PDF. The files sit in a private S3 bucket and CloudFront delivers them. There are no servers, no database and no JavaScript.</p>
+
+      <div class="dg-stats">
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#2e8540"><svg viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg></span><span class="dg-text"><strong>0 servers</strong><small>only static files</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#4b6575"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></span><span class="dg-text"><strong>0 JavaScript</strong><small>HTML and the shared CSS only</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#8c4fff"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="dg-text"><strong>All edge locations</strong><small>CloudFront, HTTP/2 and HTTP/3</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#d45b07"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span><span class="dg-text"><strong>1 CDK stack</strong><small><code>MeSite</code> in eu-west-1 (Ireland)</small></span></div>
+      </div>
+
+      <figure class="dg">
+        <figcaption>Request path</figcaption>
+        <div class="dg-flow">
+          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon" style="--dg:#4b6575"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></span><span class="dg-text"><strong>Browser</strong><small>https://dliu.com</small></span></div>
+          <div class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon" style="--dg:#8c4fff"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="dg-text"><strong>Route 53 + CloudFront</strong><small>HTTPS, certificate from ACM</small></span></div>
+          <div class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon" style="--dg:#e7157b"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h6"/></svg></span><span class="dg-text"><strong>CloudFront Functions</strong><small>clean URLs; visitor tag</small></span></div>
+          <div class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+          <div class="dg-step"><span class="dg-num">4</span><span class="dg-icon" style="--dg:#2e8540"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg></span><span class="dg-text"><strong>Private S3 bucket</strong><small>read only by CloudFront</small></span></div>
+        </div>
+        <p class="dg-note">The CloudFront certificate is issued in us-east-1, as CloudFront requires; everything else is in eu-west-1.</p>
+      </figure>
+
+      <ul>
+        <li><strong>Pages.</strong> <code>src/index.html</code>, <code>src/404.html</code>, <code>src/docs.html</code> and <code>src/docs-health.html</code>, plus <code>src/style.css</code> for the landing page's layout. The header, footer, cards and colours come from the shared dliu.com stylesheets on <code>files.dliu.com</code>, so every dliu.com site looks the same.</li>
+        <li><strong>Clean URLs.</strong> A viewer-request CloudFront Function serves <code>/</code> from <code>index.html</code>, <code>/docs</code> from <code>docs.html</code> and <code>/docs/health</code> from <code>docs-health.html</code>. Missing files return the 404 page.</li>
+        <li><strong>Visitor statistics.</strong> A shared viewer-response function sets the anonymous <code>dl_vid</code> visitor cookie, and CloudFront's access logs feed <a href="https://traffic.dliu.com/">traffic.dliu.com</a>.</li>
+        <li><strong>Résumé.</strong> Written in LaTeX (<code>resume/resume.tex</code>) and built with Tectonic by <code>make resume</code> into <code>src/resume.pdf</code>, which is served at <a href="/resume.pdf">/resume.pdf</a>.</li>
+        <li><strong>DNS.</strong> The <code>dliu.com</code> hosted zone belongs to the shared core infrastructure. This stack only adds the apex A and AAAA alias records.</li>
+      </ul>
+
+      <h2 id="caching">Caching</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Files</th><th scope="col">Browser</th><th scope="col">CloudFront edge</th></tr></thead>
+          <tbody>
+            <tr><td>HTML pages</td><td>No <code>Cache-Control</code> header</td><td>Default caching, up to 1 day</td></tr>
+            <tr><td><code>style.css</code>, <code>resume.pdf</code></td><td>5 minutes</td><td>1 day (<code>s-maxage=86400</code>, <code>stale-while-revalidate=86400</code>)</td></tr>
+            <tr><td>Shared stylesheets and icon</td><td colspan="2">Cached by files.dliu.com</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>Every deploy invalidates <code>/*</code> once, so changes show at the edge straight away. A browser may keep the old stylesheet or résumé for up to 5 minutes.</li>
+        <li>Automatic clearing on S3 changes is not used: the bucket only changes through deploys, which already clear the whole cache.</li>
+      </ul>
+
+      <h2 id="deployment">Deployment</h2>
+      <p>The site is an AWS CDK app in <code>cdk/</code>. Deploys run locally from a machine with AWS credentials; there is no CI pipeline.</p>
+      <pre class="code">make install   # npm ci in cdk/
+make test      # Jest: stack template and shared-look checks
+make resume    # rebuild src/resume.pdf (only after résumé edits)
+make deploy    # cdk deploy MeSite</pre>
+      <p>The deploy uploads <code>src/</code> to the bucket in two steps: non-HTML files with the cache headers above, then the HTML files. Both invalidate the CloudFront cache.</p>
+
+      <h2 id="cost">Cost</h2>
+      <p>Everything is billed per use, and at this site's traffic it stays inside the AWS free tiers: S3 storage for a few files, CloudFront requests and data transfer, and CloudFront Function invocations. The ACM certificate is free. The Route 53 hosted zone is shared with the other dliu.com sites.</p>
+
+      <h2 id="security">Security</h2>
+      <ul>
+        <li>The S3 bucket blocks all public access. CloudFront reads it through an origin access identity, so files are only reachable through <code>https://dliu.com</code>.</li>
+        <li>HTTP requests are redirected to HTTPS. Only <code>GET</code> and <code>HEAD</code> are allowed.</li>
+        <li>There is no sign-in, form, API or JavaScript, and the site stores nothing about visitors apart from the anonymous visitor cookie used for traffic statistics.</li>
+      </ul>
+
+      <p class="source">Source: <a href="https://github.com/dliu-com/home-site">dliu-com/home-site</a></p>
+    </article>
+  </main>
+  <footer class="dl-footer">
+    <a class="dl-footer-logo" href="https://dliu.com" aria-label="dliu.com"><img src="https://files.dliu.com/dliu.com/favicon.png" alt="" width="24" height="24"></a>
+    <a href="https://dliu.com">dliu.com</a> · <a href="/resume.pdf">Résumé</a> · <a href="https://github.com/dliu-com">GitHub</a>
+  </footer>
+</body>
+</html>

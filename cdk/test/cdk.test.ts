@@ -32,8 +32,16 @@ test('creates a private S3 bucket behind CloudFront', () => {
     });
 
     template.hasResourceProperties('Custom::CDKBucketDeployment', {
-        Exclude: ['*.html'],
+        Exclude: ['*.html', '*.md'],
         SystemMetadata: {
+            'cache-control': 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
+        },
+    });
+    template.hasResourceProperties('Custom::CDKBucketDeployment', {
+        Exclude: ['*'],
+        Include: ['*.md'],
+        SystemMetadata: {
+            'content-type': 'text/markdown; charset=utf-8',
             'cache-control': 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
         },
     });
@@ -47,4 +55,25 @@ test('creates a private S3 bucket behind CloudFront', () => {
         Type: 'A',
         AliasTarget: Match.anyValue(),
     });
+});
+
+test('the viewer-request function serves clean URLs', () => {
+    const app = new App();
+    const stack = new CdkStack(app, 'RoutingTestStack', {
+        env: { account: '123456789012', region: 'eu-west-2' },
+    });
+    const functions = Template.fromStack(stack).findResources('AWS::CloudFront::Function');
+    const [code] = Object.values(functions).map((resource: any) => resource.Properties.FunctionCode as string);
+    const handler = new Function(`${code}; return handler;`)() as (event: any) => { uri: string };
+    const route = (uri: string) => handler({ request: { uri } }).uri;
+
+    expect(route('/')).toBe('/index.html');
+    expect(route('/docs')).toBe('/docs.html');
+    expect(route('/docs/')).toBe('/docs.html');
+    expect(route('/docs/health')).toBe('/docs-health.html');
+    expect(route('/docs/health/')).toBe('/docs-health.html');
+    expect(route('/health')).toBe('/health');
+    expect(route('/docs/health.md')).toBe('/docs/health.md');
+    expect(route('/resume.pdf')).toBe('/resume.pdf');
+    expect(route('/style.css')).toBe('/style.css');
 });

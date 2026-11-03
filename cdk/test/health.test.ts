@@ -1,0 +1,80 @@
+// The dliu.com health contract (status/HEALTH.md): /docs/health (HTML, for people) and /docs/health.md (Markdown,
+// for machines) describe the same functions and guest checks. dliu.com is static, so there is no /health endpoint.
+import * as fs from 'fs';
+import * as path from 'path';
+
+const SRC = path.join(__dirname, '..', '..', 'src');
+const html = fs.readFileSync(path.join(SRC, 'docs-health.html'), 'utf8');
+const md = fs.readFileSync(path.join(SRC, 'docs', 'health.md'), 'utf8');
+
+const mdSection = (title: string) => md.split(`\n## ${title}\n`)[1].split('\n## ')[0];
+const mdRows = (title: string) => mdSection(title).split('\n')
+  .filter((line) => line.startsWith('| ') && !line.startsWith('| ---'))
+  .slice(1)
+  .map((line) => line.slice(2, -2).split(' | ').map((cell) => cell.replace(/^`|`$/g, '')));
+
+const mdFunctions = mdRows('Functions').map(([key]) => key);
+const mdChecks = mdRows('Guest checks').map((cells) => cells.join(' | '));
+const htmlFunctions = [...html.matchAll(/<h3 id="function-([a-z-]+)">/g)].map((m) => m[1]);
+const htmlChecks = [...html.matchAll(/<tr data-function="([a-z-]+)">(.*?)<\/tr>/g)].map(([, key, cells]) =>
+  [key, ...[...cells.matchAll(/<td[^>]*>(?:<code>)?(.*?)(?:<\/code>)?<\/td>/g)].map((c) => c[1])].join(' | '));
+
+test('/docs/health.md has every section the contract asks for', () => {
+  for (const title of ['Functions', 'Guest checks', 'Health endpoint', 'Not tested', 'Rules']) {
+    expect(md).toContain(`\n## ${title}\n`);
+  }
+  expect(mdSection('Rules')).toMatch(/read only/);
+});
+
+test('/docs/health has the diagram, plain-language sections, folded details and the Markdown link', () => {
+  expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
+  for (const id of ['functions', 'health-endpoint', 'not-tested']) {
+    expect(html).toContain(`<h2 id="${id}">`);
+  }
+  expect(html).toContain('<a href="/docs/health.md">Full technical version (Markdown)</a>');
+  expect(html).not.toMatch(/<details open/);
+  // Every check table is folded inside a <details> block.
+  for (const table of html.split('<table>').slice(1)) {
+    const before = html.slice(0, html.indexOf(table));
+    expect(before.lastIndexOf('<details>')).toBeGreaterThan(before.lastIndexOf('</details>'));
+  }
+});
+
+test('the page and the Markdown file list the same functions and guest checks', () => {
+  expect(mdFunctions).toEqual(['pages', 'resume', 'routing', 'https']);
+  expect(htmlFunctions).toEqual(mdFunctions);
+  expect(htmlChecks).toEqual(mdChecks);
+  expect(html).toContain(`<strong>Opens ${mdChecks.length} public addresses</strong>`);
+  expect(new Set(mdChecks.map((check) => check.split(' | ')[0]))).toEqual(new Set(mdFunctions));
+});
+
+test('guest checks are GET or HEAD on dliu.com, with a status, content type, marker and slow threshold', () => {
+  for (const check of mdChecks) {
+    const [, method, url, status, contentType, marker, slow] = check.split(' | ');
+    expect(method).toMatch(/^(GET|HEAD)$/);
+    expect(url).toMatch(/^https?:\/\/dliu\.com\//);
+    expect(status).toMatch(/^\d{3}$/);
+    expect(contentType).toMatch(/^([a-z]+\/[a-z.+-]+|-)$/);
+    expect(marker.length).toBeGreaterThan(0);
+    expect(slow).toMatch(/^\d+$/);
+  }
+  expect(mdChecks).toContain('resume | GET | https://dliu.com/resume.pdf | 200 | application/pdf | %PDF- | 3000');
+});
+
+test('the body markers really are in the pages they are checked on', () => {
+  const read = (file: string) => fs.readFileSync(path.join(SRC, file), 'utf8');
+  expect(read('index.html')).toContain('class="dl-header"');
+  expect(read('docs.html')).toContain('dl-docs-main');
+  expect(read('style.css')).toContain('.app-grid');
+  expect(md).toContain('## Guest checks');
+  expect(html).toContain('id="functions"');
+  expect(read('404.html')).toContain('Page not found');
+  expect(read('resume.pdf').startsWith('%PDF-')).toBe(true);
+});
+
+test('there is no /health endpoint, and both versions say so', () => {
+  expect(mdSection('Health endpoint')).toContain('no backend');
+  expect(html.split('<h2 id="health-endpoint">')[1]).toMatch(/^[\s\S]*?no server or database/);
+  expect(fs.existsSync(path.join(SRC, 'health'))).toBe(false);
+  expect(fs.existsSync(path.join(SRC, 'health.html'))).toBe(false);
+});

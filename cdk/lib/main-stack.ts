@@ -44,13 +44,23 @@ export class CdkStack extends Stack {
 
     const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'SiteOriginAccessIdentity');
 
+    // Clean URLs: / and /x/ -> index.html, /docs -> /docs.html, /docs/health -> /docs-health.html.
     const viewerRequestFunction = new cloudfront.Function(this, 'ViewerRequestFunction', {
       code: cloudfront.FunctionCode.fromInline(`
+var PAGES = {
+  '/docs': '/docs.html',
+  '/docs/': '/docs.html',
+  '/docs/health': '/docs-health.html',
+  '/docs/health/': '/docs-health.html',
+};
+
 function handler(event) {
   var request = event.request;
   var uri = request.uri;
 
-  if (uri.endsWith('/')) {
+  if (PAGES[uri]) {
+    request.uri = PAGES[uri];
+  } else if (uri.endsWith('/')) {
     request.uri = uri + 'index.html';
   }
 
@@ -118,7 +128,7 @@ function handler(event) {
     const staticFiles = new s3deploy.BucketDeployment(this, 'DeployStaticFiles', {
       destinationBucket: siteBucket,
       sources: [siteSource],
-      exclude: ['*.html'],
+      exclude: ['*.html', '*.md'],
       cacheControl: [
         s3deploy.CacheControl.setPublic(),
         s3deploy.CacheControl.maxAge(Duration.minutes(5)),
@@ -128,6 +138,24 @@ function handler(event) {
       distribution,
       distributionPaths: ['/*'],
     });
+
+    // Markdown (docs/health.md) needs an explicit charset; same caching as the other static files.
+    const markdownFiles = new s3deploy.BucketDeployment(this, 'DeployMarkdownFiles', {
+      destinationBucket: siteBucket,
+      sources: [siteSource],
+      exclude: ['*'],
+      include: ['*.md'],
+      contentType: 'text/markdown; charset=utf-8',
+      cacheControl: [
+        s3deploy.CacheControl.setPublic(),
+        s3deploy.CacheControl.maxAge(Duration.minutes(5)),
+        s3deploy.CacheControl.sMaxAge(Duration.days(1)),
+        s3deploy.CacheControl.fromString('stale-while-revalidate=86400'),
+      ],
+      distribution,
+      distributionPaths: ['/*'],
+    });
+    markdownFiles.node.addDependency(staticFiles);
 
     const htmlFiles = new s3deploy.BucketDeployment(this, 'DeploySiteFiles', {
       destinationBucket: siteBucket,
