@@ -1,5 +1,5 @@
 {
-  "name": "home-site-cdk",
+  "name": "dliu-com-cdk",
   "version": "1.0.0",
   "private": true,
   "description": "CDK stack for deploying the home site to S3 and CloudFront.",

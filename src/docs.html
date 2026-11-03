@@ -30,7 +30,7 @@
         <div class="dg-stat"><span class="dg-icon" style="--dg:#2e8540"><svg viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg></span><span class="dg-text"><strong>0 servers</strong><small>only static files</small></span></div>
         <div class="dg-stat"><span class="dg-icon" style="--dg:#4b6575"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></span><span class="dg-text"><strong>0 JavaScript</strong><small>HTML and the shared CSS only</small></span></div>
         <div class="dg-stat"><span class="dg-icon" style="--dg:#8c4fff"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="dg-text"><strong>All edge locations</strong><small>CloudFront, HTTP/2 and HTTP/3</small></span></div>
-        <div class="dg-stat"><span class="dg-icon" style="--dg:#d45b07"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span><span class="dg-text"><strong>1 CDK stack</strong><small><code>MeSite</code> in eu-west-1 (Ireland)</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#d45b07"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span><span class="dg-text"><strong>1 CDK stack</strong><small><code>dliu-com</code> in eu-west-1 (Ireland)</small></span></div>
       </div>
 
       <figure class="dg">
@@ -76,7 +76,7 @@
       <pre class="code">make install   # npm ci in cdk/
 make test      # Jest: stack template and shared-look checks
 make resume    # rebuild src/resume.pdf (only after résumé edits)
-make deploy    # cdk deploy MeSite</pre>
+make deploy    # cdk deploy dliu-com</pre>
       <p>The deploy uploads <code>src/</code> to the bucket in two steps: non-HTML files with the cache headers above, then the HTML files. Both invalidate the CloudFront cache.</p>
 
       <h2 id="cost">Cost</h2>
@@ -89,7 +89,7 @@ make deploy    # cdk deploy MeSite</pre>
         <li>There is no sign-in, form, API or JavaScript, and the site stores nothing about visitors apart from the anonymous visitor cookie used for traffic statistics.</li>
       </ul>
 
-      <p class="source">Source: <a href="https://github.com/dliu-com/home-site">dliu-com/home-site</a></p>
+      <p class="source">Source: <a href="https://github.com/dliu-com/dliu-com">dliu-com/dliu-com</a></p>
     </article>
   </main>
   <footer class="dl-footer">
