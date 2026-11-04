@@ -51,8 +51,8 @@ test('the /docs Health tab shows numbers, flows, a table and a chart, with the M
     expect(iconOf(html)).toBe(iconOf(architecture));
   }
   expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
-  // The Markdown version is linked right under the heading, and again at the end.
-  expect(html).toMatch(/^<h2 id="health">[^<]+<\/h2>\s*<p>Machine-readable version: <a href="\/docs\/health.md">\/docs\/health.md<\/a><\/p>/);
+  // The site's status page and the Markdown version are linked right under the heading; the Markdown again at the end.
+  expect(html).toMatch(/^<h2 id="health">[^<]+<\/h2>\s*<p>Live status: <a href="https:\/\/status.dliu.com\/site\/dliu">status.dliu.com\/site\/dliu<\/a><br>Machine-readable version: <a href="\/docs\/health.md">\/docs\/health.md<\/a><\/p>/);
   for (const id of ['functions', 'not-tested']) {
     expect(html).toContain(`<h2 id="${id}">`);
   }
@@ -62,7 +62,8 @@ test('the /docs Health tab shows numbers, flows, a table and a chart, with the M
 
 test('the Health tab has no exact technical details', () => {
   expect(html).not.toMatch(/<code|<details|<pre/);
-  expect(html).not.toMatch(/https?:\/\//);
+  // The only absolute URL is the site's own page on status.dliu.com.
+  expect(html.match(/https?:\/\/[^"<\s]*/g)).toEqual(['https://status.dliu.com/site/dliu']);
   expect(text).not.toMatch(/\b(200|301|302|304|401|403|404|500|502|503)\b/);
   expect(text).not.toMatch(/text\/html|text\/css|text\/markdown|application\/|Cache-Control|Location|GET|HEAD/);
 });
