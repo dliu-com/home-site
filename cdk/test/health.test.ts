@@ -1,11 +1,11 @@
-// The dliu.com health contract (status/HEALTH.md): the /docs Testing tab (#health, for people) and /docs/health.md (Markdown,
+// The dliu.com health contract (status/HEALTH.md): the /docs Health tab (#health, for people) and /docs/health.md (Markdown,
 // for machines) describe the same functions and guest checks. dliu.com is static, so there is no /health endpoint.
 import * as fs from 'fs';
 import * as path from 'path';
 
 const SRC = path.join(__dirname, '..', '..', 'src');
 const docs = fs.readFileSync(path.join(SRC, 'docs.html'), 'utf8');
-// The Testing tab: from its heading to the page-wide source link at the end of the article.
+// The Health tab: from its heading to the page-wide source link at the end of the article.
 const html = docs.slice(docs.indexOf('<h2 id="health">'), docs.indexOf('<p class="source">'));
 const md = fs.readFileSync(path.join(SRC, 'docs', 'health.md'), 'utf8');
 
@@ -31,8 +31,8 @@ test('/docs/health.md has every section the contract asks for', () => {
   expect(mdSection('Rules')).toMatch(/read only/);
 });
 
-test('the /docs Testing tab shows numbers, flows, a table and a chart, with the Markdown link at the end', () => {
-  expect(docs).toContain('<a href="/docs#health">Testing</a>');
+test('the /docs Health tab shows numbers, flows, a table and a chart, with the Markdown link at the end', () => {
+  expect(docs).toContain('<a href="/docs#health">Health</a>');
   expect(html).toMatch(/^<h2 id="health">/);
   expect(html).toMatch(/<div class="dg-stats">[\s\S]*class="dg-stat"/);
   expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-arrow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
@@ -43,14 +43,14 @@ test('the /docs Testing tab shows numbers, flows, a table and a chart, with the 
   expect(html.trim()).toMatch(/<p><a href="\/docs\/health.md">Technical version for machines \(Markdown\)<\/a><\/p>$/);
 });
 
-test('the Testing tab has no exact technical details', () => {
+test('the Health tab has no exact technical details', () => {
   expect(html).not.toMatch(/<code|<details|<pre/);
   expect(html).not.toMatch(/https?:\/\//);
   expect(text).not.toMatch(/\b(200|301|302|304|401|403|404|500|502|503)\b/);
   expect(text).not.toMatch(/text\/html|text\/css|text\/markdown|application\/|Cache-Control|Location|GET|HEAD/);
 });
 
-test('the Testing tab and the Markdown file list the same functions and checks', () => {
+test('the Health tab and the Markdown file list the same functions and checks', () => {
   expect(mdFunctions).toEqual(['pages', 'resume', 'routing', 'https']);
   expect(htmlFunctions).toEqual(mdFunctions);
   expect(Object.keys(chart)).toEqual(mdFunctions);

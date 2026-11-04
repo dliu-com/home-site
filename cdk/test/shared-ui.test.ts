@@ -50,7 +50,7 @@ test('the docs pages use the shared docs layout and have no menu button', () => 
     expect(page).toContain('<nav class="dl-tabs" aria-label="Docs sections">');
     expect(page).toContain('<article class="dl-docs">');
     expect(page).not.toMatch(/<script\b/);
-    expect(page).toContain('<a href="/docs#health">Testing</a>');
+    expect(page).toContain('<a href="/docs#health">Health</a>');
   }
   const page = read('docs.html');
   expect(page.indexOf(DL_CSS)).toBeLessThan(page.indexOf(DL_DOCS_CSS));
@@ -70,5 +70,25 @@ test('no page links to Docs from the header', () => {
   for (const file of pages) {
     const header = read(file).split('</header>')[0];
     expect(header).not.toMatch(/href="\/docs/);
+  }
+});
+
+test('deployed pages link to style.css with a version that changes with its content', () => {
+  const { versionedHtml } = require('../lib/main-stack');
+  const deployed: Record<string, string> = versionedHtml();
+  expect(Object.keys(deployed).sort()).toEqual(pages.slice().sort());
+  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'dliu-src-'));
+  for (const file of [...pages, 'style.css']) fs.copyFileSync(path.join(SRC, file), path.join(tmp, file));
+  fs.appendFileSync(path.join(tmp, 'style.css'), '\n/* changed */\n');
+  const changed: Record<string, string> = versionedHtml(tmp);
+  fs.rmSync(tmp, { recursive: true });
+  for (const file of pages) {
+    const versions = (html: string) => html.match(/\/style\.css(\?v=[0-9a-f]{12})?"/g) ?? [];
+    expect(deployed[file]).not.toContain('href="/style.css"');
+    if (read(file).includes(SITE_CSS)) {
+      expect(versions(deployed[file])).toHaveLength(1);
+      expect(versions(deployed[file])[0]).not.toEqual(versions(changed[file])[0]);
+    }
+    expect(deployed[file]).not.toMatch(/<script\b[^>]*\bsrc="\//);
   }
 });

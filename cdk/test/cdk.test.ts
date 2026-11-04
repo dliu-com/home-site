@@ -74,7 +74,7 @@ test('the viewer-request function serves clean URLs', () => {
     expect(route('/docs/health.md')).toBe('/docs/health.md');
     expect(route('/resume.pdf')).toBe('/resume.pdf');
     expect(route('/style.css')).toBe('/style.css');
-    // The testing page moved into the /docs Testing tab.
+    // The testing page moved into the /docs Health tab.
     for (const uri of ['/docs/health', '/docs/health/']) {
         const response = handler({ request: { uri } });
         expect(response.statusCode).toBe(301);

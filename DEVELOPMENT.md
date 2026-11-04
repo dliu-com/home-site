@@ -12,9 +12,9 @@ The pages use the shared dliu.com look ([spec](https://files.dliu.com/dliu.com/R
 
 ## Docs
 - [dliu.com/docs](https://dliu.com/docs) (`src/docs.html`) describes how the site works: architecture, caching, deployment, cost and security.
-- Its **Testing** tab, [dliu.com/docs#health](https://dliu.com/docs#health), explains in plain words, with a diagram, how [status.dliu.com](https://status.dliu.com) tests the site as a guest; the technical details are folded.
+- Its **Health** tab, [dliu.com/docs#health](https://dliu.com/docs#health), shows people, with numbers, a flow, a table and a chart, how [status.dliu.com](https://status.dliu.com) tests the site as a guest; it has no exact technical details, which live in `docs/health.md`.
 - [dliu.com/docs/health.md](https://dliu.com/docs/health.md) (`src/docs/health.md`, served as `text/markdown; charset=utf-8`) is the full technical version for machines: functions, guest checks (URL, status, content type, body marker, slow threshold) and rules. dliu.com has no backend, so there is no `/health` endpoint.
-- Keep the Testing tab and `health.md` in sync; `cdk/test/health.test.ts` fails if their functions or checks differ, or a body marker disappears.
+- Keep the Health tab and `health.md` in sync; `cdk/test/health.test.ts` fails if their functions or checks differ, or a body marker disappears.
 
 The docs page uses the shared `dl-docs.css` layout and isn't linked from the header. A viewer-request CloudFront Function serves `/docs` from `docs.html` and `/` from `index.html`, and redirects the old `/docs/health` to `/docs#health` (301). Keep the pages up to date when the stack changes.
 
@@ -28,7 +28,7 @@ make resume
 This writes `src/resume.pdf`, which the site serves for download at [dliu.com/resume.pdf](https://dliu.com/resume.pdf). Commit the rebuilt PDF and deploy.
 
 ## Caching
-- **Edge (CloudFront):** HTTP/2 and HTTP/3 are enabled. Non-HTML files (`resume.pdf`, `style.css`, `docs/health.md`) are uploaded with `Cache-Control: public, max-age=300, s-maxage=86400, stale-while-revalidate=86400`, so browsers keep them for 5 minutes and CloudFront for up to 1 day. HTML files have no `Cache-Control` header and use CloudFront's default caching (up to 1 day at the edge).
+- **Edge (CloudFront):** HTTP/2 and HTTP/3 are enabled. Non-HTML files (`resume.pdf`, `style.css`, `docs/health.md`) are uploaded with `Cache-Control: public, max-age=300, s-maxage=86400, stale-while-revalidate=86400`, so browsers keep them for 5 minutes and CloudFront for up to 1 day. HTML files have no `Cache-Control` header and use CloudFront's default caching (up to 1 day at the edge). At deploy the stack rewrites each page's `/style.css` link to `/style.css?v=<content hash>`, so a new page never runs with a stylesheet the browser cached before the deploy.
 - **Clearing:** every `make deploy` invalidates `/*` once, so changes show immediately.
 - **Automatic clearing (S3 events → CloudFront invalidation): not used.** The bucket only changes through deploys, which already clear the whole cache. Nothing writes to it at runtime. Adding automatic clearing would only spend the 1,000 free invalidation paths a month that all dliu.com sites share. Don't edit the bucket by hand; if you do, run a CloudFront invalidation yourself.
 

@@ -1,6 +1,6 @@
 # dliu.com: health and guest checks
 
-Full technical version of https://dliu.com/docs#health (the Testing tab), for machines and AI agents. It follows the dliu.com health
+Full technical version of https://dliu.com/docs#health (the Health tab), for machines and AI agents. It follows the dliu.com health
 contract used by https://status.dliu.com and is enough on its own to implement the tests.
 
 dliu.com is a static site: HTML, CSS and a PDF in a private S3 bucket behind CloudFront. There is no backend (no Lambda,

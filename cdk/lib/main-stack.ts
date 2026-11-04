@@ -1,3 +1,5 @@
+import * as crypto from 'crypto';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Construct } from 'constructs';
 import {
@@ -17,6 +19,22 @@ import {
 } from 'aws-cdk-lib';
 
 export interface CdkStackProps extends StackProps {}
+
+const SRC = path.join(__dirname, '..', '..', 'src');
+
+// style.css is cached (max-age=300, stale-while-revalidate) but HTML isn't, so each page links
+// to it as /style.css?v=<content hash>: a new deploy changes the URL and browsers never pair
+// a new page with an old stylesheet.
+export function versionedHtml(srcDir: string = SRC): Record<string, string> {
+  const css = fs.readFileSync(path.join(srcDir, 'style.css'));
+  const version = crypto.createHash('sha256').update(css).digest('hex').slice(0, 12);
+  const pages: Record<string, string> = {};
+  for (const file of fs.readdirSync(srcDir).filter((f) => f.endsWith('.html'))) {
+    pages[file] = fs.readFileSync(path.join(srcDir, file), 'utf8')
+      .split('href="/style.css"').join(`href="/style.css?v=${version}"`);
+  }
+  return pages;
+}
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props: CdkStackProps) {
@@ -165,7 +183,7 @@ function handler(event) {
     const htmlFiles = new s3deploy.BucketDeployment(this, 'DeploySiteFiles', {
       destinationBucket: siteBucket,
       destinationKeyPrefix: '',
-      sources: [siteSource],
+      sources: Object.entries(versionedHtml()).map(([file, html]) => s3deploy.Source.data(file, html)),
       exclude: ['*'],
       include: ['*.html'],
       distribution,
