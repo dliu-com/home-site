@@ -35,7 +35,24 @@ test('the /docs Health tab shows numbers, flows, a table and a chart, with the M
   expect(docs).toContain('<a href="/docs#health">Health</a>');
   expect(html).toMatch(/^<h2 id="health">/);
   expect(html).toMatch(/<div class="dg-stats">[\s\S]*class="dg-stat"/);
-  expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-arrow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
+  // Same style as the Architecture "Components" diagrams: big numbers with coloured service icons, then tiers of
+  // components joined by labelled arrows.
+  expect(html).toMatch(/<div class="dg-stats">(\s*<div class="dg-stat"><span class="dg-icon" style="--dg:#[0-9a-f]{6}"><svg[\s\S]*?<\/div>){4}\s*<\/div>/);
+  expect(html).toMatch(/<figure class="dg dg-tiers">\s*<figcaption>[^<]+<\/figcaption>\s*<div class="dg-tier dg-untrusted">[\s\S]*<div class="dg-link"><span class="dg-arrow"[\s\S]*<\/svg><\/span><span>[^<]+<\/span><\/div>\s*<div class="dg-tier dg-edge">[\s\S]*<div class="dg-link">[\s\S]*<div class="dg-tier dg-private">[\s\S]*?<\/figure>/);
+  for (const tier of html.match(/<div class="dg-tier [^"]+">[\s\S]*?<\/div><\/div>\n/g) ?? []) {
+    expect(tier).toMatch(/^<div class="dg-tier dg-[a-z]+"><div class="dg-tier-label"><span class="dg-badge">[^<]+<\/span><strong>[^<]+<\/strong><\/div>/);
+    expect(tier).toMatch(/<div class="dg-node"><span class="dg-icon" style="--dg:#[0-9a-f]{6}">/);
+  }
+  // A service drawn in both tabs has the same colour and icon in both.
+  const architecture = docs.slice(docs.indexOf('<h2 id="architecture">'), docs.indexOf('<h2 id="health">'));
+  for (const service of ['CloudFront Functions', 'Private S3 bucket']) {
+    const iconOf = (part: string) => part.match(new RegExp(`(<span class="dg-icon" style="[^"]+"><svg viewBox="0 0 24 24">(?:<[a-z][^>]*/>)+</svg></span>)<span class="dg-text"><strong>${service}<`))?.[1];
+    expect(iconOf(html)).toBeDefined();
+    expect(iconOf(html)).toBe(iconOf(architecture));
+  }
+  expect(html).toMatch(/<figure class="dg">[\s\S]*class="dg-flow"[\s\S]*class="dg-step dg-good"[\s\S]*class="dg-step dg-warn"[\s\S]*class="dg-step dg-bad"[\s\S]*<\/figure>/);
+  // The Markdown version is linked right under the heading, and again at the end.
+  expect(html).toMatch(/^<h2 id="health">[^<]+<\/h2>\s*<p>Machine-readable version: <a href="\/docs\/health.md">\/docs\/health.md<\/a><\/p>/);
   for (const id of ['functions', 'not-tested']) {
     expect(html).toContain(`<h2 id="${id}">`);
   }

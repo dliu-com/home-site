@@ -90,33 +90,36 @@ make deploy    # cdk deploy dliu-com</pre>
       </ul>
 
       <h2 id="health">How dliu.com is tested</h2>
-      <p class="lead">Every 15 minutes, status.dliu.com visits dliu.com like an ordinary visitor, without signing in, and checks that each part of the site works. The checks only look; they never change anything.</p>
+      <p>Machine-readable version: <a href="/docs/health.md">/docs/health.md</a></p>
+      <p class="lead">Every 15 minutes, status.dliu.com visits dliu.com from Ireland, Virginia and Tokyo like an ordinary visitor, without signing in, and checks that each part of the site works. Once an hour it also opens the home page from inside mainland China. The checks only look; they never change anything.</p>
 
       <div class="dg-stats">
-        <div class="dg-stat"><span class="dg-icon" style="--dg:#2563eb"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg></span><span class="dg-text"><strong>4 functions tested</strong><small>every part a visitor uses</small></span></div>
-        <div class="dg-stat"><span class="dg-icon" style="--dg:#8c4fff"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span><span class="dg-text"><strong>8 checks</strong><small>in every test run</small></span></div>
-        <div class="dg-stat"><span class="dg-icon" style="--dg:#4b6575"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Every 15 minutes</strong><small>day and night</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#4b6575"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></span><span class="dg-text"><strong>4 functions tested</strong><small>every part a visitor uses</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#209cee"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span><span class="dg-text"><strong>8 checks</strong><small>in every test run</small></span></div>
+        <div class="dg-stat"><span class="dg-icon" style="--dg:#209cee"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Every 15 minutes</strong><small>from Ireland, Virginia and Tokyo</small></span></div>
         <div class="dg-stat"><span class="dg-icon" style="--dg:#2e8540"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0"/></svg></span><span class="dg-text"><strong>0 sign-ins needed</strong><small>tested as a guest</small></span></div>
       </div>
 
+      <figure class="dg dg-tiers">
+        <figcaption>Who tests what</figcaption>
+        <div class="dg-tier dg-untrusted"><div class="dg-tier-label"><span class="dg-badge">Guest</span><strong>Testers</strong></div>
+          <div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon" style="--dg:#209cee"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><span class="dg-text"><strong>status.dliu.com</strong><small>Ireland, Virginia, Tokyo every 15 min</small></span></div><div class="dg-node"><span class="dg-icon" style="--dg:#209cee"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></span><span class="dg-text"><strong>Mainland China</strong><small>home page, once an hour</small></span></div></div></div>
+        <div class="dg-link"><span class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span><span>like any visitor: no sign-in, read only</span></div>
+        <div class="dg-tier dg-edge"><div class="dg-tier-label"><span class="dg-badge">Edge</span><strong>What visitors open</strong></div>
+          <div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon" style="--dg:#8c4fff"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="dg-text"><strong>CloudFront</strong><small>home page, docs and résumé, over a secure connection</small></span></div><div class="dg-node"><span class="dg-icon" style="--dg:#e7157b"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h6"/></svg></span><span class="dg-text"><strong>CloudFront Functions</strong><small>short links and the friendly not-found page</small></span></div></div></div>
+        <div class="dg-link"><span class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span><span>reads the files</span></div>
+        <div class="dg-tier dg-private"><div class="dg-tier-label"><span class="dg-badge">Private</span><strong>Storage</strong></div>
+          <div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon" style="--dg:#2e8540"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg></span><span class="dg-text"><strong>Private S3 bucket</strong><small>the pages and the résumé; only CloudFront can read it</small></span></div></div></div>
+        <p class="dg-note">There is no server tier: dliu.com is just files, with no server or database behind it, so checking what visitors open covers the whole site.</p>
+      </figure>
+
       <figure class="dg">
-        <figcaption>One test run, step by step</figcaption>
-        <div class="dg-flow">
-          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon" style="--dg:#4b6575"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>status.dliu.com</strong><small>visits as a guest</small></span></div>
-          <div class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
-          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon" style="--dg:#8c4fff"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="dg-text"><strong>The site’s pages</strong><small>home, docs, résumé, links</small></span></div>
-          <div class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
-          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon" style="--dg:#2e8540"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg></span><span class="dg-text"><strong>Straight from storage</strong><small>no server or database</small></span></div>
-          <div class="dg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
-          <div class="dg-step"><span class="dg-num">4</span><span class="dg-icon" style="--dg:#e7157b"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span><span class="dg-text"><strong>Each answer compared</strong><small>with what it should be</small></span></div>
-        </div>
-        <p class="dg-note">Every run ends with one of three results:</p>
+        <figcaption>Every run ends with one of three results</figcaption>
         <div class="dg-flow">
           <div class="dg-step dg-good"><span class="dg-text"><strong>Working</strong><small>every answer right, within 3 seconds</small></span></div>
-          <div class="dg-step dg-warn"><span class="dg-text"><strong>Slow</strong><small>right but slow, or missed once</small></span></div>
+          <div class="dg-step dg-warn"><span class="dg-text"><strong>Slow</strong><small>right but slow, missed once, or missed from one place only</small></span></div>
           <div class="dg-step dg-bad"><span class="dg-text"><strong>Not working</strong><small>missed in two runs in a row (about 30 minutes)</small></span></div>
         </div>
-        <p class="dg-note">dliu.com is just files, with no server or database behind it, so checking the pages covers the whole site.</p>
       </figure>
 
       <h2 id="functions">What is checked</h2>
